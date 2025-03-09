@@ -1,0 +1,11 @@
+{
+    "global-params":{
+		"simulation-name": "slower-sample",
+		"epsilon": 0.125,
+		"spreaders": 5,
+		"timesteps": 100,
+		"instancia": "slower.graph.bin",
+        "K-value": 6}
+}
+
+

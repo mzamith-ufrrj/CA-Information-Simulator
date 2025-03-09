@@ -1,0 +1,14 @@
+{
+    "global-params":{
+		"log-file": "statistic.csv",
+        "nodeX": 50,
+        "nodeY": 50,
+		"timesteps": 60,
+		"k-distance": 1,
+        "n-neighbors": 8,
+		"p-epsilon": 2.0,
+		"n-epsilon": -3.0,
+        "alpha": 0.75,
+        "delta": 0.5}
+}
+

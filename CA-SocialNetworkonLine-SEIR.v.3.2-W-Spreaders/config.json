@@ -1,0 +1,19 @@
+{
+    "global-params":{
+		"simulation-name": "teste-demo",
+		"instancia": "BA-CELL-10000-P-1-C-6.net",
+		"verbose": true,
+		"cell-x": 5,
+		"cell-y":  2,
+		"epsilon": 0.1,
+		"spreaders": 0.001,
+		"infected": 0.001,
+		"timesteps": 35,
+		"spreader-weight": 2.0,
+		"alpha-rumor-ave": 50.0,
+		"alpha-rumor-sd":   10.0,
+		"gamma-rumor-ave": 50.0,
+		"gamma-rumor-sd":   10.0}
+}
+
+

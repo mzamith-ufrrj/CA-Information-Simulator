@@ -1,0 +1,16 @@
+{
+    "global-params":{
+		"simulation-name": "BA-Model-10000-epsilon_1E-10-alpha_5E1_1E1_gamma_5E1_1E1",
+		"epsilon": 0.1,
+		"spreaders": 5,
+		"timesteps": 30,
+		"alpha-rumor-ave": 50.0,
+		"alpha-rumor-sd":   10.0,
+		"gamma-rumor-ave": 50.0,
+		"gamma-rumor-sd":   10.0,
+		"cell-x": 100,
+		"cell-y":  20,
+		"instancia": "BA-Model-Nodes-10000-power-1-connection-6.net"}
+}
+
+

@@ -1,0 +1,8 @@
+*.o
+*.exec
+*.bin
+*.csv
+*.pdf
+*.net
+obj/
+.Rproj.user
