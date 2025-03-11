@@ -9,7 +9,7 @@
 #  Versão sobre propação de informação online. Caso do whatsapp
 #
 ################################################################################
-EXEFILE      = IModelCA++
+EXEFILE      = IModelCA++.exec
 APPLICATION  = -D_APPLICATION=\"$(EXEFILE)\"
 CPUCC       = g++
 CPPFLAGS    =  -m64 -Wno-reorder #     -Wunused-variable #-Wno-conversion-null -Wdelete-non-virtual-dtor
