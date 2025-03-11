@@ -7,10 +7,10 @@
 		"cell-y":  1000,
 		"infected": 0.01,
 		"timesteps": 35,
-		"infected_init_order": "desc",
+		"infected_init_order": "rand",
 		"alpha-rumor-mi":    1.5,
 		"alpha-rumor-sig":   0.25,
-		"gamma-rumor-mi":    1.8,
+		"gamma-rumor-mi":    2.0,
 		"gamma-rumor-sig":   0.75}
 }
 

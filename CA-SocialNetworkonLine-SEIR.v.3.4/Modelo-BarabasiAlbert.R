@@ -2,8 +2,8 @@ library(igraph)
 library(ggraph)
 library(tidygraph)
 rm(list = ls())
-nodes <- 100
-n_power <- 2
+nodes <- 20
+n_power <- 1
 m_connection <- 6
 is_save_pajek <- TRUE
 is_save_plot  <- TRUE

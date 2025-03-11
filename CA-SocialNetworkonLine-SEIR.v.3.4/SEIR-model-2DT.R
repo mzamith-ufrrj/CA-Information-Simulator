@@ -4,8 +4,8 @@ rm(list = ls())
 # R --vanilla < SEIR-model.R 
 # Rscript SEIR-model.R
 print("SEIR MODEL")
-file_name_dateset1  <- "statistic.teste-P-1-C-6.csv"
-file_name_dateset2  <- "statistic.teste-P-2-C-6.csv"
+file_name_dateset1  <- "statistic.default-N-1000000-P-1-C-6.csv"
+file_name_dateset2  <- "statistic.default-N-10000-P-1-C-6.csv"
 #file_name_pdf <- "SEIR-Model.BA-CELL-1000000-P-1-C-6__Ep0_25__AAV-10_ASD-2_5__GAV-10-GSD-2_5.pdf"
 my_title <-"$\\epsilon$ = 0.25 / N($\\mu_{\\alpha}$ = 10, $\\sigma_{\\alpha}$ = 2.5) / N($\\mu_{\\gamma}$ = 10, $\\sigma_{\\gamma}$ = 2.5)"
 

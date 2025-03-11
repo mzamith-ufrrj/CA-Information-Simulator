@@ -4,9 +4,9 @@ rm(list = ls())
 # R --vanilla < SEIR-model.R 
 # Rscript SEIR-model.R
 print("SEIR MODEL")
-file_name_dateset  <- "statistic.teste-P-1-C-6.csv"
-file_name_pdf <- "SEIR-AG.BA-CELL-1000000-P-1-C-6__Ep0_25__AAV-10_ASD-2_5__GAV-10-GSD-2_5.pdf"
-my_title <-"$\\epsilon \\times \\alpha \\times \\gamma$"
+file_name_dateset  <- "statistic.default-N-1000000-P-1-C-6.csv"
+#file_name_pdf <- "SEIR-AG.BA-CELL-1000000-P-1-C-6__Ep0_25__AAV-10_ASD-2_5__GAV-10-GSD-2_5.pdf"
+#my_title <-"$\\epsilon \\times \\alpha \\times \\gamma$"
 
 SN_data <-read.table(file_name_dateset, header = T, quote = '"', 
                      row.names = NULL, 
@@ -31,7 +31,7 @@ g <- ggplot() +
   scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
   scale_x_continuous(breaks = seq(0, 50, by = 1)) +
   scale_color_manual(values = c ("epsilon" = "green", "alpha" = "blue", "gamma" = "red")) +  # Custom colors
-  labs(title = TeX(my_title), color = "States:", x = "Time", y = "Average value") +
+  labs(color = "States:", x = "Time", y = "Average value") +
   theme_bw() + 
   theme(#legend.position = "none",
     legend.position = "top",

@@ -14,6 +14,11 @@
 using namespace std;
 #define ERROR 1E-20
 enum STATES {ZEROSTATE, SUSCEPTIBLE, EXPOSED, INFECTED, RECOVERED};
+struct st_index{
+    uint64_t  key;
+	uint64_t index;
+
+};
 //enum INFECTED_NETWORK_ORDER {NO_ORDER, RANDOM_ORDER, ASCENDENT_ORDER, DESCENDENT_ORDER;}
 class SocialNetwork{
     public:

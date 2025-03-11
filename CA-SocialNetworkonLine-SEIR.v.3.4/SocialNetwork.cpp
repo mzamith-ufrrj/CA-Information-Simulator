@@ -203,48 +203,49 @@ void SocialNetwork::initialCondition(void){
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------------
     start_time = std::chrono::high_resolution_clock::now();
-    //Order solution
-    if (mInitNetworkOpt.compare("asc") == 0){
-        std::sort(&(mAgents[0]), &(mAgents[mN_Nodes-1]), [](Agent &a, Agent &b) {
-            return b.getInDegree() < a.getInDegree();
-        });
-        double value = floor(mP_Infected * static_cast<double> (mN_Nodes));
-        mN_Infected = static_cast<uint64_t> (value) + 1;
-        for  (uint64_t node = 0; node < mN_Infected; node++){
-            mAgents[node].setStates(STATES::INFECTED);
-        }
-
-    }else if (mInitNetworkOpt.compare("desc") == 0){
-        std::sort(&(mAgents[0]), &(mAgents[mN_Nodes-1]), [](Agent &a, Agent &b) {
-            return b.getInDegree() > a.getInDegree();
-        });
-        double value = floor(mP_Infected * static_cast<double> (mN_Nodes));
-        mN_Infected = static_cast<uint64_t> (value) + 1;
-        for  (uint64_t node = 0; node < mN_Infected; node++){
-            mAgents[node].setStates(STATES::INFECTED);
-        }
-    }else if (mInitNetworkOpt.compare("rand") == 0){
-        //Random solution based on in degree
-        double value = floor(mP_Infected * static_cast<double> (mN_Nodes));
-        mN_Infected = static_cast<uint64_t> (value) + 1;
-        std::cout << "\t - Infected:" <<  mN_Infected <<  std::endl;
+    double value = floor(mP_Infected * static_cast<double> (mN_Nodes));
+    mN_Infected = static_cast<uint64_t> (value) + 1;
+    std::cout << "\t - Infected: [" <<  mN_Infected <<  "]" << std::endl;
+    if (mInitNetworkOpt.compare("rand") == 0){
         for  (uint64_t node = 0; node < mN_Infected; node++){
             bool selected = false;
             do{
                 double p =  mUniform(mGen);
-                double dn = floor(p * static_cast<double> (mN_Nodes));
-                uint64_t n = static_cast<uint64_t> (dn);
-
-                if (mAgents[n].getState() != STATES::INFECTED){
-                    mAgents[n].setStates(STATES::INFECTED);
-                    //std::cout << "\tInfected: " << n << std::endl;
+                add = mVetProb[0];
+                uint64_t j = 1;
+                while (p > add)
+                    add = mVetProb[j++];
+                j--;
+                if (mAgents[j].getState() == STATES::SUSCEPTIBLE){
+                    mAgents[j].setStates(STATES::INFECTED);
                     selected = true;
-                }//
+                }
             }while (!selected);
         }//for  (uint64_t node = 0; node < mSpreaders; node++){
-    }else{ //else if (infected_init_order.compare("rand"){
-        std::cerr << "[ERROR] unindentify infected individual order" << std::endl;
-        exit(EXIT_FAILURE);
+    }else{ //if (mInitNetworkOpt.compare("rand") == 0){
+        //Creating index to order the Agent vector
+        st_index *idx = NULL;
+        assert(posix_memalign(reinterpret_cast<void**>(&idx), ALIGN, mN_Nodes *  sizeof(st_index)) == 0);
+        bzero(idx, mN_Nodes *  sizeof(st_index));
+        for (uint64_t i = 0; i < mN_Nodes; i++){
+            idx[i].index = i;
+            idx[i].key   = mAgents[i].getInDegree();
+        }
+
+        if (mInitNetworkOpt.compare("asc") == 0){
+            std::sort(&(idx[0]), &(idx[mN_Nodes-1]), [](st_index &a, st_index &b) {
+                return b.key < a.key;
+            });
+        }else if (mInitNetworkOpt.compare("desc") == 0){
+            std::sort(&(idx[0]), &(idx[mN_Nodes-1]), [](st_index &a, st_index &b) {
+                return b.key > a.key;
+            });
+        }
+
+        for  (uint64_t node = 0; node < mN_Infected; node++){
+            mAgents[idx[node].index].setStates(STATES::INFECTED);
+        }
+        free(idx);
     }
 
 
@@ -338,10 +339,10 @@ void SocialNetwork::update(uint64_t t){
 
 double SocialNetwork::buildEpsilon(uint64_t node, uint64_t iTime){
 
-		double epsilon = 0.0, in_k = 0.0f, samples = 0.0f;
+		double epsilon = 0.0, inf_k = 0.0f, sus = 0.0, sus_k = 0.0, inf = 0.0;
         //Influence of who I follow
 		st_NeighborNode *LNodes = mAgents[node].getOutList();
-        double in_max = 0.0;
+         
 		while (LNodes != NULL){
 			uint64_t source = LNodes->index;
             /**
@@ -352,141 +353,138 @@ double SocialNetwork::buildEpsilon(uint64_t node, uint64_t iTime){
              */
             //2025-03-07 The most influencer in my echo chamber
 			if (mAgents[source].getState() == INFECTED){
-                //in_k += (1.0 - (mAgents[source].getInDegree() / mMaxInDegree));
-                if (mAgents[source].getInDegree() > in_max)
-                    in_max  = mAgents[source].getInDegree();
-                //in_k += (mAgents[source].getInDegree() / mMaxInDegree);
-                in_k += mAgents[source].getInDegree();
-                samples++;
-            }
+            inf++;
+			      inf_k +=  mAgents[source].getInDegree();
+            //in_k += (1.0 - (mAgents[source].getInDegree() / mMaxInDegree));
+            //if (mAgents[source].getInDegree() > in_max)
+            //in_max  = mAgents[source].getInDegree();
+            //in_k += (mAgents[source].getInDegree() / mMaxInDegree);
+            //in_k += mAgents[source].getInDegree();
+            //samples++;
+      }else if (mAgents[source].getState() ==  SUSCEPTIBLE){
+        sus++;
+			   
+			  sus_k += mAgents[source].getInDegree();;
+			  
+			  
+			}
 			LNodes = LNodes->next;
 		}//while (LNodes != NULL){
-        if (samples > 0.0) in_k /= samples;
-        //if (in_max > 0.0) in_k /= in_max;
-        in_k /= 6.0;
-        epsilon = 1.0 - exp(-in_k);
-
-        assert(!isnan(epsilon) && !isinf(epsilon));
-        assert((epsilon >= 0.0) && (epsilon <= 1.0));
-        //epsilon += 1.75;
-        //if (epsilon < 0.0) epsilon = 0.0;
-        //if (epsilon > 1.0) epsilon = 1.0;
+		
+		
+		double t = static_cast<double>(iTime);
+		if (iTime  == 0) t = ERROR  ;
+		
+		
+		if (inf_k > 0.0)
+		  epsilon = (1.0 - exp(-((inf/inf_k) + t))); //alpha = (s/k) + (1.0 - exp(-c/k));
+		
+		if (sus_k > 0.0)
+		  epsilon -= (1.0 - exp(-((sus/sus_k) + t)));
+		
+		//
+		
+		if (epsilon < ERROR)
+		  epsilon =  1.0 - exp(-t);
+		
 		return epsilon;
 }
 
 double SocialNetwork::buildAlpha(uint64_t node, uint64_t iTime){
 
-		double inf = 0.0, rec = 0.0, alpha = 0.0;
+		double inf = 0.0, rec = 0.0, inf_k = 0.0, rec_k = 0.0, alpha = 0.0;
 		st_NeighborNode *LNodes = mAgents[node].getOutList();
 
 		while (LNodes != NULL){
 			//k++;
 			uint64_t source = LNodes->index;
 			if (mAgents[source].getState() == INFECTED){
-                double in_k = mAgents[source].getInDegree();
-                inf += in_k;
-            }else if (mAgents[source].getState() ==  RECOVERED){
-                double in_k = mAgents[source].getInDegree();
-                rec += in_k;
-            }
+                double k = mAgents[source].getInDegree();
+			          inf_k += k;
+			          
+			          inf++;
+      }else if (mAgents[source].getState() ==  RECOVERED){
+          double k = mAgents[source].getInDegree();
+          rec_k += k;
+          
+          rec++;
+      }
 
 			//match.push_back(source);
 
 			LNodes = LNodes->next;
 		}
+    
+    double p = mN_Alpha_Rumor(mGen); //mW_Alpha;
+		
+		double t = static_cast<double>(iTime);
+		if (iTime > 0)	t /= p;
+		else t = ERROR  / p;
 
-		double total = rec + inf;
-        double v_inf = 0.0, v_rec = 0.0;
-
-        if (total  > 0.0){
-            v_inf = inf / total;
-            v_rec = rec / total;
-        }
-
-
-        double p = mN_Alpha_Rumor(mGen); //mW_Alpha;
-        double t = static_cast<double>(iTime);
-
-        alpha = ((1 + v_inf - v_rec) / 2.0) * (exp(-t / p));
-
-
-        assert((alpha >= 0) &&  (alpha <= 1));
-        if (alpha > 1.0) alpha = 1.0;
-        if (alpha < 0.0) alpha = 0.0;
+     
+    if (inf_k > 0.0)
+      alpha = (1.0 - exp(-((inf/inf_k) + t))); //alpha = (s/k) + (1.0 - exp(-c/k));
+    
+    if (rec_k > 0.0)
+      alpha -= (1.0 - exp(-((rec/rec_k) + t)));
+    
+      //
+      
+    if (alpha < ERROR)
+      alpha =  1.0 - exp(-t);
 		return alpha;
 }
+
+
 double SocialNetwork::buildGamma(uint64_t node, uint64_t iTime){
-
-    double rec  = 0.0,
-           inf  = 0.0,
-           in_k = 0.0,
-           gamma = 0.0;
-
+    
+    double inf = 0.0, rec = 0.0, inf_k = 0.0, rec_k = 0.0, gamma = 0.0;
     st_NeighborNode *LNodes = mAgents[node].getOutList();
-	while (LNodes != NULL){
-
-		uint64_t source = LNodes->index;
-		if (mAgents[source].getState() == RECOVERED){
-            in_k++;
-			rec++;
-		}else if (mAgents[source].getState() == INFECTED){
-            in_k++;
-			inf++;
-		}
-
-		LNodes = LNodes->next;
-	}//while (LNodes != NULL){
-
-    //Observação: 2025-02-16
-    //A ideia do viez congnitivo acoplado, pois existem vertices que não são influenciados por nada
-    //neste caso, tornam-se evetualmente expostos, mas não trocam de estado.
-    double t = static_cast<double>(iTime);
-    double p = mN_Gamma_Rumor(mGen);
-
-
-    if (in_k > 0.0){
-        double v1 = (rec/in_k);
-        double v2 = (inf/in_k);
-
-        gamma = ((1.0 + v1 - v2) / 2.0) * (exp(-t/p)) ;
-    }else{
-        //I does not have anyone to influence me
-        //Just time influences me 2025-02-16
-        gamma =  (exp(-t / p));
-
+    
+    
+    while (LNodes != NULL){
+      //k++;
+      uint64_t source = LNodes->index;
+      if (mAgents[source].getState() == INFECTED){
+        double k = mAgents[source].getInDegree();
+        inf_k += k;
+        
+        inf++;
+      }else if (mAgents[source].getState() ==  RECOVERED){
+        double k = mAgents[source].getInDegree();
+        rec_k += k;
+        
+        rec++;
+      }
+      
+      //match.push_back(source);
+      
+      LNodes = LNodes->next;
     }
-
-    if (gamma > 1.0) gamma = 1.0;
-    if (gamma < 0.0) gamma = 0.0;
+    
+    double p = mN_Gamma_Rumor(mGen); //mW_Alpha;
+    
+    double t = static_cast<double>(iTime);
+    
+    
+    if (iTime > 0)	t /= p;
+    else t = ERROR  / p;
+    
+    
+    if (inf_k > 0.0)
+      gamma = -(1.0 - exp(-((inf/inf_k) + t))); //alpha = (s/k) + (1.0 - exp(-c/k));
+    
+    if (rec_k > 0.0)
+      gamma += (1.0 - exp(-((rec/rec_k) + t)));
+    
+    //
+    
+    if (gamma < ERROR)
+      gamma =  1.0 - exp(-t);
+    assert((gamma >= 0) &&  (gamma <= 1));
     return gamma;
+}
 
-	//return
-
-}//double SocialNetwork::buldGamma(uint64_t node){
-
-
-/*
-double SocialNetwork::buildGamma(uint64_t node, uint64_t time){
-    double di = 0.0, in_k = 0.0;
-    boost::adjacency_matrix<boost::directedS> *pGraph = mGraph.get();
-    std::pair my_pair = in_edges(node, *pGraph); // Get the range of outgoing edges quem eu estou conetado
-    for ( auto it = my_pair.first; it != my_pair.second; ++it) {
-        in_k++;
-        uint64_t source = boost::source(*it, *pGraph);
-        if (mAgents[source].getState() == RECOVERED) di++;
-
-
-    }//for (auto it = edge_begin; it != edge_end; ++it) {
-    //if (!(in_k > 0.0))
-     //   std::cerr << in_k << " " << di << std::endl;
-    assert(in_k >= 0.0);
-    double p1 = di /in_k;
-    if (isnan(p1)) p1 = 0.0;
-    return (1.0 - exp(-static_cast<double>(time) + p1));
-	//return
-
-}//double SocialNetwork::buldGamma(uint64_t node){
-*/
 void SocialNetwork::susceptible2NS(uint64_t node, uint64_t itime){
     double epsilon = buildEpsilon(node, itime);
     double alpha = buildAlpha(node, itime);
@@ -494,19 +492,11 @@ void SocialNetwork::susceptible2NS(uint64_t node, uint64_t itime){
 
     mAveAlpha += alpha;
     mN_Alpha++;
-
-	mAveEpsilon += epsilon;
+    
+    mAveEpsilon += epsilon;
     mN_Epsilon++;
 
-    /*
-    if (prob < epsilon){
-		//std::cerr << "nop" << std::endl;
-		mAgents[node].setState(EXPOSED);
-	}else{
-		//std::cerr << "nop" << std::endl;
-		mAgents[node].setState(mAgents[node].getState()); //Keep the state
-	}
-	*/
+
 
     double a = alpha;
     double b = a + epsilon * (1.0 - alpha);

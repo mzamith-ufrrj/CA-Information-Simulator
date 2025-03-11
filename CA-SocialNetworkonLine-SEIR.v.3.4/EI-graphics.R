@@ -4,8 +4,8 @@ rm(list = ls())
 # R --vanilla < SEIR-model.R 
 # Rscript SEIR-model.R
 print("SEIR MODEL")
-file_name_dateset1  <- "statistic.DS1.csv"
-file_name_dateset2  <- "statistic.DS.csv"
+file_name_dateset1  <- "statistic.default-N-10000-P-1-C-6-desc-0.csv"
+file_name_dateset2  <- "statistic.default-N-10000-P-1-C-6-asc.csv"
 #file_name_pdf <- "SEIR-Model.BA-CELL-1000000-P-1-C-6__Ep0_25__AAV-10_ASD-2_5__GAV-10-GSD-2_5.pdf"
 my_title <-"$\\epsilon$ = 0.25 / N($\\mu_{\\alpha}$ = 10, $\\sigma_{\\alpha}$ = 2.5) / N($\\mu_{\\gamma}$ = 10, $\\sigma_{\\gamma}$ = 2.5)"
 
@@ -44,8 +44,8 @@ g <- ggplot() +
   
 
   #-----------  
-coord_cartesian(ylim = c(0, 1000000)) +
-  scale_y_continuous(breaks = seq(0, 1000000, by = 100000)) +
+coord_cartesian(ylim = c(0, 10000)) +
+  scale_y_continuous(breaks = seq(0, 10000, by = 1000)) +
   scale_x_continuous(limits = c(1, 30), breaks = seq(0, 30, by = 1)) +
   #scale_color_manual(values = c("susceptible - ds1" = "blue", "exposed - ds1" = "orange", "infected - ds1" = "red", "recovered - ds1" = "green")) +  # Custom colors
   #scale_color_manual(values = c("susceptible - ds1" = "blue", "exposed - ds1" = "orange", "infected - ds1" = "red", "recovered - ds1" = "green", "susceptible - ds2" = "lightblue", "exposed - ds2" = "lightorange", "infected - ds2" = "lightred", "recovered - ds2" = "lightgreen")) +  # Custom colors

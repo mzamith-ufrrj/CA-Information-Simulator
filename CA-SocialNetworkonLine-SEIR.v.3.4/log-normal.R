@@ -1,8 +1,8 @@
 # Define the mean" and standard deviation
 library(latex2exp)
 rm(list = ls())
-mi <- .15
-sigma <- 0.75
+mi <- 1
+sigma <- 0.25
 title <- sprintf("Log-normal distribuition curve ($\\mu = %.2f / $\\sigma = %.2f)", mi, sigma)
 filename <- sprintf("pdf-log-normal-%.2f-%.2f.pdf", mi, sigma)
 
