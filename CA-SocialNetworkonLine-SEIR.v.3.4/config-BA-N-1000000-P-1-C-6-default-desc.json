@@ -5,7 +5,7 @@
 		"verbose": true,
 		"cell-x": 1000,
 		"cell-y":  1000,
-		"infected": 0.0001,
+		"infected": 0,
 		"timesteps": 35,
 		"infected_init_order": "desc",
 	 	"alpha-rumor-mi":    1.0,

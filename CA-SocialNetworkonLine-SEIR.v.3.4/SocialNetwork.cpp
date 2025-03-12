@@ -203,11 +203,21 @@ void SocialNetwork::initialCondition(void){
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------------
     start_time = std::chrono::high_resolution_clock::now();
-    double value = floor(mP_Infected * static_cast<double> (mN_Nodes));
-    mN_Infected = static_cast<uint64_t> (value) + 1;
+    double value = 0.0;
+    if (mP_Infected < 1.0){
+        value = floor(mP_Infected * static_cast<double> (mN_Nodes));
+    }else{
+        value = floor(mP_Infected);
+    }
+
+
+
+    mN_Infected = static_cast<uint64_t> (value);
+    if (mN_Infected == 0) mN_Infected = 1;
     std::cout << "\t - Infected: [" <<  mN_Infected <<  "]" << std::endl;
     if (mInitNetworkOpt.compare("rand") == 0){
         for  (uint64_t node = 0; node < mN_Infected; node++){
+
             bool selected = false;
             do{
                 double p =  mUniform(mGen);
@@ -243,6 +253,7 @@ void SocialNetwork::initialCondition(void){
         }
 
         for  (uint64_t node = 0; node < mN_Infected; node++){
+
             mAgents[idx[node].index].setStates(STATES::INFECTED);
         }
         free(idx);
@@ -385,7 +396,7 @@ double SocialNetwork::buildEpsilon(uint64_t node, uint64_t iTime){
 		//
 		
 		if (epsilon < ERROR)
-		  epsilon =  1.0 - exp(-t);
+		  epsilon = 0.0;
 		
 		return epsilon;
 }
@@ -430,9 +441,8 @@ double SocialNetwork::buildAlpha(uint64_t node, uint64_t iTime){
     
       //
       
-    if (alpha < ERROR)
-      alpha =  1.0 - exp(-t);
-		return alpha;
+    if (alpha < ERROR)  alpha =  0.0;
+    return alpha;
 }
 
 
@@ -707,7 +717,7 @@ void SocialNetwork::print(void){
 	//cout << "\tEpsion rate       : (" << setw(8) << fixed << setprecision(4) << mEpsilon  << ")" << endl;
 	cout << "\tAlpha Log-Normal  : (" << setw(8) << fixed << setprecision(4) << mAlpha_Rumor_MI  << "," << mAlpha_Rumor_SIG << ")" << endl;
 	cout << "\tGamma Log-Normal  : (" << setw(8) << fixed << setprecision(4) << mGamma_Rumor_MI  << "," << mGamma_Rumor_SIG << ")" << endl;
-	cout << "\t Infected : (" << setw(8) << fixed << mP_Infected << " %)" << endl;
+	//cout << "\t Infected : (" << setw(8) << fixed << mP_Infected << " %)" << endl;
 	cout << "\t Infected order : [" << mInitNetworkOpt << "]" << endl;
 	cout << "\tLog files: " << endl;
 	cout << "\t - Log file statistic:      [" << mLogFileStatistic << "]" << endl;
