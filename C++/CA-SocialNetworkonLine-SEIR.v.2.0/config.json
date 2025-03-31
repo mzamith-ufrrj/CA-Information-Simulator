@@ -1,0 +1,13 @@
+{
+    "global-params":{
+		"simulation-name": "config-sample",
+		"epsilon": 0.125,
+		"spreaders": 5,
+		"timesteps": 30,
+		"alpha-weight": 10.0,
+		"gamma-weight": 30.0,
+		"instancia": "config.graph.bin",
+        "K-value": 6}
+}
+
+

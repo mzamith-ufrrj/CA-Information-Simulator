@@ -1,0 +1,17 @@
+{
+    "global-params":{
+		"simulation-name": "default-N-10000-P-1-C-6-desc-0",
+		"instancia": "BA-N-10000-P-1-C-6.net",
+		"verbose": true,
+		"cell-x": 1000,
+		"cell-y":  1000,
+		"infected": 10.1,
+		"timesteps": 35,
+		"infected_init_order": "asc",
+	 	"alpha-rumor-mi":    1.0,
+		"alpha-rumor-sig":   0.1,
+		"gamma-rumor-mi":    2.12,
+		"gamma-rumor-sig":   0.1}
+}
+
+
