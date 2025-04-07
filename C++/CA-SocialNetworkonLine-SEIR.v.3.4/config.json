@@ -14,5 +14,14 @@
 		"gamma-rumor-mi":    2.0,
 		"gamma-rumor-sig":   0.75}
 }
+remove key
+Install key
 
+id_alphaMi
+id_alphaSig
+id_gammaMi
+id_gammaSig
 
+<!-- Submit -->
+      <button type="submit" class="btn btn-primary">Start Simulation</button>
+    </form>
