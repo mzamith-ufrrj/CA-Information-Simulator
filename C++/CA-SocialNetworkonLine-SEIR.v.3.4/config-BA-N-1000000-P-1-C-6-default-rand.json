@@ -1,7 +1,7 @@
 {
     "global-params":{
 		"simulation-name": "default-N-1000000-P-1-C-6-rand",
-		"instancia": "BA-N-1000000-P-1-C-6.net",
+		"instance": "BA-N-1000000-P-1-C-6.net",
 		"verbose": true,
 		"cell-x": 1000,
 		"cell-y":  1000,

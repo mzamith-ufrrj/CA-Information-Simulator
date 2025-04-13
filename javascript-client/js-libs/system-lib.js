@@ -8,7 +8,7 @@
  * @brief Inform the link of simulation.
  * @returns {string} URL of simulation.
  */
-function getRunSimulationURL(){         return "https://www.dcc.ufrrj.br/marcelo-z/api-run-simulation.php"}
+function getRunSimulationURL(){         return "https://www.dcc.ufrrj.br/marcelo-z/~seir/api-run-simulation.php"}
 
 /**
  * @function getKeyName
@@ -111,7 +111,7 @@ async function main_run_simulation(){
             minConnected: parseInt(document.getElementById("id_minConnected").value),
             cellsX: parseInt(document.getElementById("id_cellsX").value),
             cellsY: parseInt(document.getElementById("id_cellsY").value),
-            infected: parseInt(document.getElementById("id_infected").value),
+            infected: parseFloat(document.getElementById("id_infected").value),
             timesteps: parseInt(document.getElementById("id_timesteps").value),
             infectedOrder: document.getElementById("infectedOrder").value,
             alphaMi: parseFloat(document.getElementById("id_alphaMi").value),
@@ -120,7 +120,8 @@ async function main_run_simulation(){
             gammaSig: parseFloat(document.getElementById("id_gammaSig").value),
             verbose: document.getElementById("verbose").checked
         };
-         const dataJson = JSON.stringify(dataEnconded, null, 2);
+        //console.log("Part 1", dataEnconded);
+        //const dataJson = JSON.stringify(dataEnconded, null, 2);
 
     // Send to server
     const response = await fetch(getRunSimulationURL(), {
@@ -131,13 +132,16 @@ async function main_run_simulation(){
         body: JSON.stringify({
             message: message,
             user: username,
-            param:dataJson,
+            params:dataEnconded,
             signature: signatureBase64
         })
     });
 
     //Get server answer
     const result = await response.text();
+    console.log("Server says:", result);
+
+    /*
     const answer = JSON.parse(result);
 
     if (answer["status"] == "auth_error"){
@@ -150,7 +154,7 @@ async function main_run_simulation(){
     }
     console.log(answer["status"]);
     console.log(answer["user"]);
-
+    */
 
     //console.log("Server says:", result);
 

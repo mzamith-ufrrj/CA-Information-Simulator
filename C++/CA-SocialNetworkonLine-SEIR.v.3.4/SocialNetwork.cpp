@@ -58,7 +58,7 @@ void SocialNetwork::loadConfig(const std::string& filename){
     mVerbose = root["global-params"].get("verbose", "UTF-8" ).asBool();
     mLogFileStatistic = std::string("statistic." + name + ".csv");
     mFileStateAgent   = std::string("agent." + name + ".ppm");
-    mFileGraph        =  root["global-params"].get("instancia", "UTF-8" ).asString();
+    mFileGraph        =  root["global-params"].get("instance", "UTF-8" ).asString();
 
     mP_Infected = root["global-params"].get("infected", "UTF-8" ).asDouble();
 

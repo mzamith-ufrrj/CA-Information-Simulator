@@ -1,7 +1,7 @@
 {
     "global-params":{
 		"simulation-name": "simulationname",
-		"instancia": "filename.net",
+		"instance": "filename.net",
 		"verbose": true,
 		"cell-x": 1000,
 		"cell-y":  1000,
