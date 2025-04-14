@@ -24,9 +24,9 @@ function getKeyName(){                  return "privateKeyPem-SEIR-Model"; }
  */
 function main_on_load_script(){
     // Set default values/initial condition
-    const date = Date.now()
-    const st_simulation = date + "-SEIR-Model"
-    document.getElementById("id_simulationName").value = st_simulation;
+    //const date = Date.now()
+    //const st_simulation = date + "-SEIR-Model"
+    //document.getElementById("id_simulationName").value = st_simulation;
     document.getElementById("id_numNodes").value = 10000;
     document.getElementById("id_cellsX").value = 100;
     document.getElementById("id_cellsY").value = 100;
@@ -105,7 +105,6 @@ async function main_run_simulation(){
         const username = document.getElementById("id_Login").value;
 
         const dataEnconded = {
-            simulationName: document.getElementById("id_simulationName").value,
             numNodes: parseInt(document.getElementById("id_numNodes").value),
             power: parseFloat(document.getElementById("id_power").value),
             minConnected: parseInt(document.getElementById("id_minConnected").value),
