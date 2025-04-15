@@ -76,6 +76,27 @@ function install_key(){
         //console.log("Received from popup:", event.data);
     });
 }
+/**
+ * @function download CSV
+ * @brief
+ */
+function downloadCSV() {
+  const csvData =  document.getElementById("id_simulation_output").value;
+
+  const defaultFilename = "simulation_data.csv";
+  const filename = prompt("Enter the filename:", defaultFilename);
+  if (!filename) return; // user canceled
+
+  const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
 /**
  * @function main_run_simulation
@@ -138,25 +159,88 @@ async function main_run_simulation(){
 
     //Get server answer
     const result = await response.text();
-    console.log("Server says:", result);
+    const data =  JSON.parse(result);
+    const status = data.status;
+    console.log("Server status: ", status);
+    if (status == "OK simulation"){
 
-    /*
-    const answer = JSON.parse(result);
+        const csvData = data.data_simulation;
+        document.getElementById("id_simulation_output").value = csvData;
+        // Parse CSV
+        const lines = csvData.trim().split("\n");
+        const headers = lines[0].split(";");
 
-    if (answer["status"] == "auth_error"){
-        const popup = window.open("out-not-found-err.html", "Popup");
-        window.addEventListener("message", (event) => {
-            if (event.origin !== window.location.origin) return; // safety check
-            console.log("Received from popup:", event.data);
+        const time = [];
+        const susceptible = [];
+        const exposed = [];
+        const infected = [];
+        const recovered = [];
+
+        lines.slice(1).forEach(line => {
+        const parts = line.split(";");
+        time.push(parts[0]);
+        susceptible.push(parts[1]);
+        exposed.push(parts[2]);
+        infected.push(parts[3]);
+        recovered.push(parts[4]);
         });
-        return;
-    }
-    console.log(answer["status"]);
-    console.log(answer["user"]);
-    */
 
-    //console.log("Server says:", result);
+        const ctx = document.getElementById('simulationChart').getContext('2d');
+        new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: time,
+                    datasets: [
+                    {
+                        label: 'Susceptible',
+                        data: susceptible,
+                        borderColor: 'blue',
+                        fill: false
+                    },
+                    {
+                        label: 'Exposed',
+                        data: exposed,
+                        borderColor: 'orange',
+                        fill: false
+                    },
+                    {
+                        label: 'Infected',
+                        data: infected,
+                        borderColor: 'red',
+                        fill: false
+                    },
+                    {
+                        label: 'Recovered',
+                        data: recovered,
+                        borderColor: 'green',
+                        fill: false
+                    }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                    x: {
+                        title: {
+                        display: true,
+                        text: 'Time'
+                        }
+                    },
+                    y: {
+                        title: {
+                        display: true,
+                        text: 'Individuals'
+                        },
+                        beginAtZero: true
+                    }
+                    }
+                }
+                });
+            //console.log("Simulation:", data.data_simulation);
+            //document.getElementById("id_simulation_output").value = data.data_simulation;
 
-}
+    }//if (status == "OK simulation"){
+
+}//async function main_run_simulation(){
 
 
