@@ -97,7 +97,11 @@ function downloadCSV() {
   link.click();
   document.body.removeChild(link);
 }
-
+/**
+ *
+ * @brief Global variable so that javascript can keep reference to variable and also can destroy it when necessary.
+ */
+let chartInstance = null;
 /**
  * @function main_run_simulation
  * @brief This function performs authentication with the server.
@@ -143,103 +147,124 @@ async function main_run_simulation(){
         //console.log("Part 1", dataEnconded);
         //const dataJson = JSON.stringify(dataEnconded, null, 2);
 
-    // Send to server
-    const response = await fetch(getRunSimulationURL(), {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            message: message,
-            user: username,
-            params:dataEnconded,
-            signature: signatureBase64
-        })
-    });
-
-    //Get server answer
-    const result = await response.text();
-    const data =  JSON.parse(result);
-    const status = data.status;
-    console.log("Server status: ", status);
-    if (status == "OK simulation"){
-
-        const csvData = data.data_simulation;
-        document.getElementById("id_simulation_output").value = csvData;
-        // Parse CSV
-        const lines = csvData.trim().split("\n");
-        const headers = lines[0].split(";");
-
-        const time = [];
-        const susceptible = [];
-        const exposed = [];
-        const infected = [];
-        const recovered = [];
-
-        lines.slice(1).forEach(line => {
-        const parts = line.split(";");
-        time.push(parts[0]);
-        susceptible.push(parts[1]);
-        exposed.push(parts[2]);
-        infected.push(parts[3]);
-        recovered.push(parts[4]);
-        });
-
-        const ctx = document.getElementById('simulationChart').getContext('2d');
-        new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: time,
-                    datasets: [
-                    {
-                        label: 'Susceptible',
-                        data: susceptible,
-                        borderColor: 'blue',
-                        fill: false
+        //UI component to inform the users that the server is working
+        const spinner = document.getElementById('loadingSpinner');
+         // Show spinner
+        spinner.classList.remove('d-none');
+        try {//Running the simulation
+        //--------------------------------------------
+        // Send to server
+                const response = await fetch(getRunSimulationURL(), {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
                     },
-                    {
-                        label: 'Exposed',
-                        data: exposed,
-                        borderColor: 'orange',
-                        fill: false
-                    },
-                    {
-                        label: 'Infected',
-                        data: infected,
-                        borderColor: 'red',
-                        fill: false
-                    },
-                    {
-                        label: 'Recovered',
-                        data: recovered,
-                        borderColor: 'green',
-                        fill: false
-                    }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                    x: {
-                        title: {
-                        display: true,
-                        text: 'Time'
-                        }
-                    },
-                    y: {
-                        title: {
-                        display: true,
-                        text: 'Individuals'
-                        },
-                        beginAtZero: true
-                    }
-                    }
-                }
+                    body: JSON.stringify({
+                        message: message,
+                        user: username,
+                        params:dataEnconded,
+                        signature: signatureBase64
+                    })
                 });
-            //console.log("Simulation:", data.data_simulation);
-            //document.getElementById("id_simulation_output").value = data.data_simulation;
 
-    }//if (status == "OK simulation"){
+                //Get server answer
+                const result = await response.text();
+                const data =  JSON.parse(result);
+                const status = data.status;
+                console.log("Server status: ", status);
+                if (status == "OK simulation"){
+                    document.getElementById('id_output_div').classList.replace("d-none", "d-block");
+                    const csvData = data.data_simulation;
+                    document.getElementById("id_simulation_output").value = csvData;
+                    // Parse CSV
+                    const lines = csvData.trim().split("\n");
+                    const headers = lines[0].split(";");
+
+                    const time = [];
+                    const susceptible = [];
+                    const exposed = [];
+                    const infected = [];
+                    const recovered = [];
+
+                    lines.slice(1).forEach(line => {
+                    const parts = line.split(";");
+                    time.push(parts[0]);
+                    susceptible.push(parts[1]);
+                    exposed.push(parts[2]);
+                    infected.push(parts[3]);
+                    recovered.push(parts[4]);
+                    });
+
+                    const ctx = document.getElementById('simulationChart').getContext('2d');
+                    if (chartInstance)  chartInstance.destroy();
+                    chartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: time,
+                                datasets: [
+                                {
+                                    label: 'Susceptible',
+                                    data: susceptible,
+                                    borderColor: 'blue',
+                                    fill: false
+                                },
+                                {
+                                    label: 'Exposed',
+                                    data: exposed,
+                                    borderColor: 'orange',
+                                    fill: false
+                                },
+                                {
+                                    label: 'Infected',
+                                    data: infected,
+                                    borderColor: 'red',
+                                    fill: false
+                                },
+                                {
+                                    label: 'Recovered',
+                                    data: recovered,
+                                    borderColor: 'green',
+                                    fill: false
+                                }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                x: {
+                                    title: {
+                                    display: true,
+                                    text: 'Time'
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                    display: true,
+                                    text: 'Individuals'
+                                    },
+                                    beginAtZero: true
+                                }
+                                }
+                            }
+                            });
+                        //console.log("Simulation:", data.data_simulation);
+                        //document.getElementById("id_simulation_output").value = data.data_simulation;
+
+                }//if (status == "OK simulation"){
+
+
+        //--------------------------------------------
+
+        } catch (error) {
+            console.error('Error during simulation:', error);
+            alert('Simulation failed.');
+        } finally {
+            // Hide spinner
+            spinner.classList.add('d-none');
+        }
+
+
+
 
 }//async function main_run_simulation(){
 

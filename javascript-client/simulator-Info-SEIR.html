@@ -90,8 +90,6 @@
       <!-- Alpha/Gamma Parameters -->
       <div class="row">
 
-
-
         <div class="col-md-3 mb-3">
           <label for="alphaMi" class="form-label">Alpha Rumor μ</label>
           <input type="number" class="form-control" step="any" id="id_alphaMi" name="alphaMi" required>
@@ -117,22 +115,34 @@
       </div>
 
       <button class="btn btn-primary btn-dark btn-block" type="button" id="id_start_btn" onclick="main_run_simulation();"><img src="./imgs/start_white.svg" alt="Check" width="16" height="16" class="me-2" > Start</button>
-
       <hr>
-      <div class="container">
-        <h3 class="mb-4">SEIR Model</h3>
-        <h2 class="mb-4">&nbsp; &nbsp; - Plot</h2>
-        <canvas id="simulationChart" height="100"></canvas>
-      </div>
-      <div class="fixed-box">
-            <div class="mb-3">
-                <h2>&nbsp; &nbsp; - CSV format:
 
-                <textarea class="form-control font-monospace" id="id_simulation_output" rows="6" readonly></textarea>
-                <button class="btn btn-primary btn-dark btn-block" type="button" id="id_download_btn" onclick="downloadCSV();"><img src="./imgs/download_white.svg" alt="Check" width="16" height="16" class="me-2" > Download</button>
+
+    <!-- Spinner placeholder -->
+    <div id="loadingSpinner" class="d-none text-center my-3">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Running simulation...</span>
+        </div>
+        <div class="mt-2">Running simulation...</div>
+    </div>
+      <div id="id_output_div" class="d-none">
+            <!-- Ploting SEIR model in canvas -->
+            <div class="container">
+                <h3 class="mb-4">SEIR Model</h3>
+                <h2 class="mb-4">&nbsp; &nbsp; - Plot</h2>
+                <canvas id="simulationChart" height="100"></canvas>
             </div>
+            <!-- Writing CSV SEIR model simulation  -->
+            <div class="fixed-box">
+                    <div class="mb-3">
+                        <h2>&nbsp; &nbsp; - CSV format:
 
-       </div>
+                        <textarea class="form-control font-monospace" id="id_simulation_output" rows="6" readonly></textarea>
+                        <button class="btn btn-primary btn-dark btn-block" type="button" id="id_download_btn" onclick="downloadCSV();"><img src="./imgs/download_white.svg" alt="Check" width="16" height="16" class="me-2" > Download</button>
+                    </div>
+            </div>
+      </div>
+
   </div>
 
 
