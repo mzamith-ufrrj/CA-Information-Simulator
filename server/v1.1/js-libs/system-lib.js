@@ -302,7 +302,9 @@ async function main_run_simulation(){
                         //document.getElementById("id_simulation_output").value = data.data_simulation;
 
                 }//if (status == "OK simulation"){
-
+                else{
+                    alert("there is no valid key!");
+                }
 
         //--------------------------------------------
 

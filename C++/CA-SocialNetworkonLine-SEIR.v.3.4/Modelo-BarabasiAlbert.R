@@ -1,3 +1,4 @@
+#Rscript Modelo-BarabasiAlbert.R 200 1 6
 library(igraph)
 library(ggraph)
 library(tidygraph)
