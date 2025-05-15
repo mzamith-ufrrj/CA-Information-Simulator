@@ -23,10 +23,9 @@ void SocialNetwork::initMem(void){
 	mAveAlpha = mN_Alpha = mAveGamma = mN_Gamma = 0.0;
 	mAlpha_Rumor_MI =  mAlpha_Rumor_SIG = mGamma_Rumor_MI = 0.0;
 	mGamma_Rumor_SIG =  mAveEpsilon =  mN_Epsilon = 0.0;
-    mAveOutDegree =  mAveInDegree = mMaxOutDegree = mMaxInDegree = 0.0;
-	mP_Infected = 0.0;
-    mN_Infected = 0;
-    mInitNetworkOpt = "";
+  mAveOutDegree =  mAveInDegree = mMaxOutDegree = mMaxInDegree = 0.0;
+	mP_Infected = 0.0;mN_Infected = 0;mInitNetworkOpt = "";
+	mExpMean_MI = 0.0;
 
 	mGen.seed(std::chrono::system_clock::now().time_since_epoch().count());
 }
@@ -73,6 +72,7 @@ void SocialNetwork::loadConfig(const std::string& filename){
 
     mCellX = root["global-params"].get("cell-x", "UTF-8" ).asUInt();
     mCellY = root["global-params"].get("cell-y", "UTF-8" ).asUInt();
+    mExpMean_MI  = root["global-params"].get("exponential-mean", "UTF-8" ).asDouble();
     mInitNetworkOpt   =  root["global-params"].get("infected_init_order", "UTF-8" ).asString();
 
     if (mVerbose) print();
@@ -349,56 +349,16 @@ void SocialNetwork::update(uint64_t t){
 }//void SocialNetwork::update(void){
 
 double SocialNetwork::buildEpsilon(uint64_t node, uint64_t iTime){
+    double epsilon = 0.0f;
+    double mi      = 0.9;
+    double lambda  = 1.0/mi; //E[X] = 10
+    double p = mUniform(mGen);
 
-		double epsilon = 0.0, inf_k = 0.0f, sus = 0.0, sus_k = 0.0, inf = 0.0;
-        //Influence of who I follow
-		st_NeighborNode *LNodes = mAgents[node].getOutList();
-         
-		while (LNodes != NULL){
-			uint64_t source = LNodes->index;
-            /**
-             * This is the credibility weight who I follow. If that person is an influencer,
-             *    he/she is more important and I will share the information. Otherwise he/his
-             *    is John Doe/Jane Doe and the information is not important. The exposition level is low
-             *
-             */
-            //2025-03-07 The most influencer in my echo chamber
-			if (mAgents[source].getState() == INFECTED){
-            inf++;
-			      inf_k +=  mAgents[source].getInDegree();
-            //in_k += (1.0 - (mAgents[source].getInDegree() / mMaxInDegree));
-            //if (mAgents[source].getInDegree() > in_max)
-            //in_max  = mAgents[source].getInDegree();
-            //in_k += (mAgents[source].getInDegree() / mMaxInDegree);
-            //in_k += mAgents[source].getInDegree();
-            //samples++;
-      }else if (mAgents[source].getState() ==  SUSCEPTIBLE){
-        sus++;
-			   
-			  sus_k += mAgents[source].getInDegree();;
-			  
-			  
-			}
-			LNodes = LNodes->next;
-		}//while (LNodes != NULL){
-		
-		
-		double t = static_cast<double>(iTime);
-		if (iTime  == 0) t = ERROR  ;
-		
-		
-		if (inf_k > 0.0)
-		  epsilon = (1.0 - exp(-( (inf/inf_k) + t) )); //alpha = (s/k) + (1.0 - exp(-c/k));
-		
-		if (sus_k > 0.0)
-		  epsilon -= (1.0 - exp(-((sus/sus_k) + t)));
-		
-		//
-		
-		if (epsilon < ERROR)
-		  epsilon = 0.0;
-		
-		return epsilon;
+    epsilon = log(1.0 - p) / -lambda;
+    assert(!isnan(epsilon));
+    assert(!isinf(epsilon));
+
+	return epsilon;
 }
 
 double SocialNetwork::buildAlpha(uint64_t node, uint64_t iTime){
@@ -442,7 +402,7 @@ double SocialNetwork::buildAlpha(uint64_t node, uint64_t iTime){
       //
       
     if (alpha < ERROR)  alpha =  0.0;
-    return alpha;
+    return 0.0;
 }
 
 
@@ -496,6 +456,7 @@ double SocialNetwork::buildGamma(uint64_t node, uint64_t iTime){
 }
 
 void SocialNetwork::susceptible2NS(uint64_t node, uint64_t itime){
+
     double epsilon = buildEpsilon(node, itime);
     double alpha = buildAlpha(node, itime);
     double prob = mUniform(mGen);

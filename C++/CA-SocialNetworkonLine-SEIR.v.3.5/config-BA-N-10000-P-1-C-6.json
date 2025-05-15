@@ -1,6 +1,6 @@
 {
     "global-params":{
-		"simulation-name": "teste-II",
+		"simulation-name": "Alpha-influencia",
 		"instance": "BA-N-10000-P-1-C-6.net",
 		"verbose": true,
 		"cell-x": 1000,
@@ -8,9 +8,10 @@
 		"infected": 0.01,
 		"timesteps": 35,
 		"infected_init_order": "rand",
-		"alpha-rumor-mi":    1.5,
-		"alpha-rumor-sig":   0.25,
-		"gamma-rumor-mi":    2.0,
+		"exponential-mean":  0.1,
+		"alpha-rumor-mi":    2.0,
+		"alpha-rumor-sig":   0.5,
+		"gamma-rumor-mi":    3.0,
 		"gamma-rumor-sig":   0.75}
 }
 

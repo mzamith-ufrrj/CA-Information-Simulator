@@ -1,0 +1,1 @@
+/home/marcelo/Documents/02-Trabalhos/03.Develop/ACs/Information/sources/RUST/SEIR-Model-RURAL/CA-Model/target/debug/CA-Model: /home/marcelo/Documents/02-Trabalhos/03.Develop/ACs/Information/sources/RUST/SEIR-Model-RURAL/CA-Model/src/main.rs

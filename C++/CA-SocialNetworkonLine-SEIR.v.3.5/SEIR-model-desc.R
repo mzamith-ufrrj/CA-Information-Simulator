@@ -5,8 +5,8 @@ rm(list = ls())
 # Rscript SEIR-model.R
 
 print("SEIR MODEL")
-file_name_dateset1 <- "statistic.teste-II.csv"
-file_name_pdf <- "statistic.teste-II.csv.pdf"
+file_name_dateset1 <- "statistic.default-N-1000000-P-1-C-6-desc.csv"
+file_name_pdf <- "order.statistic.default-N-1000000-P-1-C-6-desc-zoom.pdf"
 #my_title <-"Log-Normal - 1"
 
 SN_data <-read.table(file_name_dateset1, header = T, quote = '"',
@@ -39,10 +39,10 @@ g <- ggplot() +
   geom_point(data = SN_data, aes(x = time, y = recovered_percent,  color="recovered"), size=2.5) +
   
 #  coord_cartesian(ylim = c(0, 1000000)) +
-  coord_cartesian(ylim = c(0, 1)) +
+  coord_cartesian(ylim = c(0, 0.01)) +
   #scale_y_continuous(breaks = seq(0, 1000000, by = 100000)) +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
-  scale_x_continuous(breaks = seq(0, 35, by = 1)) +
+  scale_y_continuous(breaks = seq(0, 0.01, by = 0.002)) +
+  scale_x_continuous(breaks = seq(0, 20, by = 1)) +
   scale_color_manual(values = c("susceptible" = "green", "exposed" = "orange", "infected" = "red", "recovered" = "blue")) +  # Custom colors
   #BA-CELL-10000-P-1-C-6__Ep0_1__AAV-10_ASD-2_5__GAV-10-GSD-2_5
   #labs(title = TeX(my_title), color = "States:", x = "Time", y = "Cells (users)") +
@@ -57,7 +57,7 @@ g <- ggplot() +
     axis.title=element_text(size=16), #change font size of axis titles
     plot.title=element_text(size=20), #change font size of plot title
     legend.text=element_text(size=14), #change font size of legend text
-    legend.title=element_text(size=14))
+    legend.title=element_text(size=14)) 
 
 print(g)    
 #ggsave("plot.pdf", plot = p, width = 6.5, height = 4.5, units = "in", device = "pdf")
