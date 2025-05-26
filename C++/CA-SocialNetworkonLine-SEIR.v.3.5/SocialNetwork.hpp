@@ -70,7 +70,7 @@ class SocialNetwork{
         double mAlpha_Rumor_SIG;
         double mGamma_Rumor_MI;
         double mGamma_Rumor_SIG;
-        double mExpMean_MI;
+        double mLambda;
         double mMaxOutDegree;
         double mMaxInDegree;
         double mAveOutDegree;

@@ -4,7 +4,7 @@ rm(list = ls())
 # R --vanilla < SEIR-model.R 
 # Rscript SEIR-model.R
 print("SEIR MODEL")
-file_name_dateset  <- "statistic.teste-II.csv"
+file_name_dateset  <- "statistic.sample-I.csv"
 #file_name_pdf <- "SEIR-AG.BA-CELL-1000000-P-1-C-6__Ep0_25__AAV-10_ASD-2_5__GAV-10-GSD-2_5.pdf"
 #my_title <-"$\\epsilon \\times \\alpha \\times \\gamma$"
 

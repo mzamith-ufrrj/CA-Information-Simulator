@@ -5,10 +5,7 @@ rm(list = ls())
 # Rscript SEIR-model.R
 
 print("SEIR MODEL")
-file_name_dateset1 <- "statistic.Alpha-influencia.csv"
-file_name_pdf <- "statistic.Alpha-influencia.csv.pdf"
-#my_title <-"Log-Normal - 1"
-
+file_name_dateset1 <- "statistic.sample-I.csv"
 SN_data <-read.table(file_name_dateset1, header = T, quote = '"',
                              row.names = NULL, 
                              stringsAsFactors = FALSE, sep=";")

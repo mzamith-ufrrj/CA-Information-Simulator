@@ -17,6 +17,6 @@ plot(x, y, type = "l", lwd = 2, col = "blue",
      xlab = "x", ylab = "Density")
 
 # Add a grid for better visualization
-grid()
-dev.print(pdf, filename)
-dev.off()
+#grid()
+#dev.print(pdf, filename)
+#dev.off()

@@ -3,12 +3,17 @@ library(igraph)
 library(ggraph)
 library(tidygraph)
 rm(list = ls())
-args<-commandArgs(TRUE)
-nodes <- as.numeric(args[1]) #1000
-n_power <- as.numeric(args[2]) #1
-m_connection <- as.numeric(args[3]) # 6 
-is_save_pajek <- TRUE
-is_save_plot  <- FALSE
+# args<-commandArgs(TRUE)
+# nodes <- as.numeric(args[1]) #1000
+# n_power <- as.numeric(args[2]) #1
+# m_connection <- as.numeric(args[3]) # 6
+
+nodes <- as.numeric(20) #1000
+n_power <- as.numeric(2) #1
+m_connection <- as.numeric(6) # 6
+
+is_save_pajek <- FALSE
+is_save_plot  <- TRUE
 file_label <- sprintf("BA-N-%d-P-%d-C-%d", nodes, n_power, m_connection);
 if (is_save_pajek){
   file_graph <- sprintf("%s.net", file_label)  
@@ -41,13 +46,13 @@ if (is_save_plot){
     geom_edge_link(aes(end_cap = circle(3, 'mm')),
                    arrow = arrow(length = unit(2, 'mm')),
                    color = "gray") +  # Add arrows to edges
-    geom_node_point(size=2.5, color="blue") +  # Nodes in blue
+    geom_node_point(size=4, color="blue") +  # Nodes in blue
     #geom_node_text(aes(label = name), repel = TRUE, size = 4) +  # Node labels
     theme_void() +
-    ggtitle("Directed Scale-Free Network (BA Model)")
+    ggtitle("Modelo BA - livre de escala")
     print(gg)
-    #ggsave(filename = file_plot, plot=gg,  width = 20, height = 10)
-    #print("Graph Saved")
+    ggsave(filename = file_plot, plot=gg,  width = 20, height = 10)
+    print("Graph Saved")
 }
 
 

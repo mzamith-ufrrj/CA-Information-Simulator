@@ -23,9 +23,9 @@ void SocialNetwork::initMem(void){
 	mAveAlpha = mN_Alpha = mAveGamma = mN_Gamma = 0.0;
 	mAlpha_Rumor_MI =  mAlpha_Rumor_SIG = mGamma_Rumor_MI = 0.0;
 	mGamma_Rumor_SIG =  mAveEpsilon =  mN_Epsilon = 0.0;
-  mAveOutDegree =  mAveInDegree = mMaxOutDegree = mMaxInDegree = 0.0;
+    mAveOutDegree =  mAveInDegree = mMaxOutDegree = mMaxInDegree = 0.0;
 	mP_Infected = 0.0;mN_Infected = 0;mInitNetworkOpt = "";
-	mExpMean_MI = 0.0;
+	mLambda = 0.0;
 
 	mGen.seed(std::chrono::system_clock::now().time_since_epoch().count());
 }
@@ -72,7 +72,7 @@ void SocialNetwork::loadConfig(const std::string& filename){
 
     mCellX = root["global-params"].get("cell-x", "UTF-8" ).asUInt();
     mCellY = root["global-params"].get("cell-y", "UTF-8" ).asUInt();
-    mExpMean_MI  = root["global-params"].get("exponential-mean", "UTF-8" ).asDouble();
+    mLambda  = root["global-params"].get("lambda", "UTF-8" ).asDouble();
     mInitNetworkOpt   =  root["global-params"].get("infected_init_order", "UTF-8" ).asString();
 
     if (mVerbose) print();
@@ -349,12 +349,10 @@ void SocialNetwork::update(uint64_t t){
 }//void SocialNetwork::update(void){
 
 double SocialNetwork::buildEpsilon(uint64_t node, uint64_t iTime){
-    double epsilon = 0.0f;
-    double mi      = 0.9;
-    double lambda  = 1.0/mi; //E[X] = 10
-    double p = mUniform(mGen);
+    double dTime  = static_cast<double>(iTime);
+    double epsilon = 1.0 - exp(-mLambda * dTime);
 
-    epsilon = log(1.0 - p) / -lambda;
+
     assert(!isnan(epsilon));
     assert(!isinf(epsilon));
 
@@ -363,8 +361,8 @@ double SocialNetwork::buildEpsilon(uint64_t node, uint64_t iTime){
 
 double SocialNetwork::buildAlpha(uint64_t node, uint64_t iTime){
 
-		double inf = 0.0, rec = 0.0, inf_k = 0.0, rec_k = 0.0, alpha = 0.0;
-		st_NeighborNode *LNodes = mAgents[node].getOutList();
+		double inf_k = 0.0, rec_k = 0.0, alpha = 0.0;
+		st_NeighborNode *LNodes = mAgents[node].getOutList(); //List of I'm connected
 
 		while (LNodes != NULL){
 			//k++;
@@ -372,85 +370,74 @@ double SocialNetwork::buildAlpha(uint64_t node, uint64_t iTime){
 			if (mAgents[source].getState() == INFECTED){
                 double k = mAgents[source].getInDegree();
 			          inf_k += k;
-			          
-			          inf++;
-      }else if (mAgents[source].getState() ==  RECOVERED){
-          double k = mAgents[source].getInDegree();
-          rec_k += k;
-          
-          rec++;
-      }
-
-			//match.push_back(source);
-
-			LNodes = LNodes->next;
-		}
+            }else if (mAgents[source].getState() ==  RECOVERED){
+                double k = mAgents[source].getInDegree(); //How many connections are in my neighbor
+                rec_k += k;
+            }
+            //match.push_back(source);
+            LNodes = LNodes->next;
+        }
     
-    double p = mN_Alpha_Rumor(mGen); //mW_Alpha;
-		
-		double t = static_cast<double>(iTime);
-		if (iTime > 0)	t /= p;
-		else t = ERROR  / p;
+    double p1 = mN_Alpha_Rumor(mGen); //mW_Alpha;
 
-     
-    if (inf_k > 0.0)
-      alpha = (1.0 - exp(-((inf/inf_k) + t))); //alpha = (s/k) + (1.0 - exp(-c/k));
+
+    double t1 = static_cast<double>(iTime);
+
+    if (iTime > 0){
+        t1 /= p1;
+
+    }else{
+        t1 = ERROR  / p1;
+
+    }
+
+    alpha = (1.0 - exp(-((inf_k/mMaxInDegree) * t1))); //alpha = (s/k) + (1.0 - exp(-c/k));
+    //alpha -= (1.0 - exp(-((rec_k/mMaxInDegree) * t1)));
     
-    if (rec_k > 0.0)
-      alpha -= (1.0 - exp(-((rec/rec_k) + t)));
-    
-      //
-      
+    assert(!isnan(alpha) && !isinf(alpha));
     if (alpha < ERROR)  alpha =  0.0;
-    return 0.0;
+    return alpha;
 }
 
 
 double SocialNetwork::buildGamma(uint64_t node, uint64_t iTime){
     
-    double inf = 0.0, rec = 0.0, inf_k = 0.0, rec_k = 0.0, gamma = 0.0;
+    double inf_k = 0.0, rec_k = 0.0, gamma = 0.0;
     st_NeighborNode *LNodes = mAgents[node].getOutList();
     
     
     while (LNodes != NULL){
-      //k++;
       uint64_t source = LNodes->index;
-      if (mAgents[source].getState() == INFECTED){
-        double k = mAgents[source].getInDegree();
-        inf_k += k;
-        
-        inf++;
-      }else if (mAgents[source].getState() ==  RECOVERED){
+      //if (mAgents[source].getState() == INFECTED){
+      //  double k = mAgents[source].getInDegree();
+      //  inf_k += k;
+      //}else
+      if (mAgents[source].getState() ==  RECOVERED){
         double k = mAgents[source].getInDegree();
         rec_k += k;
-        
-        rec++;
       }
-      
+
       //match.push_back(source);
       
       LNodes = LNodes->next;
     }
     
-    double p = mN_Gamma_Rumor(mGen); //mW_Alpha;
+    double p1 = mN_Gamma_Rumor(mGen); //mW_Alpha;
+
+    double t1 = static_cast<double>(iTime);
+
+    if (iTime > 0){
+            t1 /= p1;
+    }
+    else{
+      t1 = ERROR  / p1;
+    }
     
-    double t = static_cast<double>(iTime);
-    
-    
-    if (iTime > 0)	t /= p;
-    else t = ERROR  / p;
-    
-    
-    if (inf_k > 0.0)
-      gamma = -(1.0 - exp(-((inf/inf_k) + t))); //alpha = (s/k) + (1.0 - exp(-c/k));
-    
-    if (rec_k > 0.0)
-      gamma += (1.0 - exp(-((rec/rec_k) + t)));
-    
-    //
-    
+    //gamma = -(1.0 - exp(-((inf_k/mMaxInDegree) * t2))); //alpha = (s/k) + (1.0 - exp(-c/k));
+    gamma = (1.0 - exp(-((rec_k/mMaxInDegree) * t1)));
+    assert(!isnan(gamma) && !isinf(gamma));
     if (gamma < ERROR)
-      gamma =  1.0 - exp(-t);
+      gamma =  1.0 - exp(-static_cast<double>(iTime));
     assert((gamma >= 0) &&  (gamma <= 1));
     return gamma;
 }
@@ -505,22 +492,6 @@ void SocialNetwork::exposed2NS(uint64_t node, uint64_t itime){
         mAgents[node].setState(INFECTED);
     else
         mAgents[node].setState(mAgents[node].getState()); //Keep the state
-
-    /*
-    if (gamma <= prob) && (prob <= ((1.0 - gamma)))
-
-	if (prob < gamma){
-			//std::cerr <<  "exposed2NS EXPOSED -> RECOVERED" << std::endl;
-			mAgents[node].setState(RECOVERED);
-	}else if (prob < alpha * (1.0 - gamma)){
-			//std::cerr <<  "exposed2NS EXPOSED -> INFECTED" << std::endl;
-			mAgents[node].setState(INFECTED);
-	}else{
-		//std::cerr <<  "exposed2NS keeps state" << std::endl;
-		mAgents[node].setState(mAgents[node].getState()); //Keep the state
-	}
-    */
-
 
 }
 
